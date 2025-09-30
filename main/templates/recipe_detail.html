@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -73,10 +74,21 @@
             opacity: 0.7;
         }
         
-        .badge {
-            background-color: var(--color-paprika) !important;
-            color: white;
-        }
+/* No toques las badges de Bootstrap (bg-success, bg-warning, bg-danger, etc.) */
+.badge[class*="bg-"] {
+  /* deja que Bootstrap maneje el color */
+}
+
+/* Usa esta clase sólo para las badges de ETIQUETAS personalizadas */
+.tag-badge {
+  background-color: var(--color-paprika);
+  color: white;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 999px;
+  padding: .45rem .6rem;
+  font-weight: 600;
+}
+
     </style>
 </head>
 <body>

@@ -1,3 +1,4 @@
+{% load ui_extras %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -108,11 +109,19 @@
             border-color: var(--color-paprika);
             box-shadow: 0 0 0 0.2rem rgba(210, 105, 30, 0.25);
         }
-        
-        .badge {
-            background-color: var(--color-paprika) !important;
-            color: white;
-        }
+/* Deja que Bootstrap maneje badges con bg-* (success, warning, danger, etc.) */
+.badge[class*="bg-"] {}
+
+/* Usa esta clase sólo para ETIQUETAS personalizadas (tags) */
+.tag-badge {
+    font-size: 0.75rem;        /* más pequeñas */
+    padding: 0.25em 0.6em;     /* menos altura */
+    border-radius: 20px;       /* pill redondeado */
+    display: inline-block;
+    font-weight: 500;
+    margin: 2px;
+}
+
         
         .recipe-card .card-title {
             color: var(--color-cinnamon);
@@ -334,11 +343,15 @@
                         <!-- Etiquetas -->
                         {% if recipe.tags.all %}
                         <div class="mb-2">
-                            {% for tag in recipe.tags.all %}
-                            <span class="badge bg-secondary me-1">{{ tag.name }}</span>
-                            {% endfor %}
+                        {% for tag in recipe.tags.all %}
+                            <span class="badge tag-badge me-1"
+                                style="background-color: {{ tag.color }}; color: {{ tag.color|contrast_color }};">
+                            <i style="opacity:.9;"></i>{{ tag.name }}
+                            </span>
+                        {% endfor %}
                         </div>
                         {% endif %}
+
                         
                         <div class="mt-auto">
                             <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary w-100">
