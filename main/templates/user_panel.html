@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Usuario - Recetas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --color-cream: #FFF8DC;  /* Vainilla/Crema */
+            --color-honey: #FFB347;   /* Miel/Dorado */
+            --color-paprika: #D2691E; /* Tomate/Paprika */
+            --color-cinnamon: #A0522D; /* Canela */
+            --color-pumpkin: #FF7518;  /* Calabaza */
+            --color-pepper: #C65D07;   /* Pimentón */
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--color-cream), #fff);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--color-cinnamon), var(--color-paprika)) !important;
+            box-shadow: 0 2px 10px rgba(165, 82, 45, 0.3);
+        }
+        
+        .navbar-brand {
+            color: var(--color-cream) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            color: var(--color-cream) !important;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            color: var(--color-honey) !important;
+            transform: translateY(-1px);
+        }
+        
+        .card {
+            border: 2px solid var(--color-honey);
+            box-shadow: 0 6px 15px rgba(165, 82, 45, 0.15);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(165, 82, 45, 0.25);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-cream));
+            border-bottom: 2px solid var(--color-paprika);
+            color: var(--color-cinnamon);
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-paprika), var(--color-pepper));
+            border-color: var(--color-paprika);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--color-pepper), var(--color-paprika));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(210, 105, 30, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--color-cinnamon), var(--color-pepper));
+            border-color: var(--color-cinnamon);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, var(--color-pepper), var(--color-cinnamon));
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--color-paprika);
+            color: var(--color-paprika);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--color-paprika);
+            border-color: var(--color-paprika);
+        }
+        
+        h1, h2, h3 {
+            color: var(--color-cinnamon);
+            text-shadow: 1px 1px 2px rgba(165, 82, 45, 0.1);
+        }
+        
+        .welcome-section {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-cream));
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 3px solid var(--color-paprika);
+        }
+        
+        .stats-card {
+            background: linear-gradient(45deg, var(--color-cream), white);
+            border: 2px solid var(--color-honey);
+            border-radius: 15px;
+        }
+        
+        .recipe-card-small {
+            border: 1px solid var(--color-honey);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .recipe-card-small:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(210, 105, 30, 0.2);
+            border-color: var(--color-paprika);
+        }
+        
+        .text-muted {
+            color: var(--color-cinnamon) !important;
+            opacity: 0.7;
+        }
+        
+        .badge {
+            background-color: var(--color-paprika) !important;
+        }
+        
+        .alert-info {
+            background-color: var(--color-honey);
+            border-color: var(--color-paprika);
+            color: var(--color-cinnamon);
+        }
+        
+        /* Estilos específicos para mejorar visibilidad de iconos y botones */
+        .text-success {
+            color: var(--color-cinnamon) !important;
+        }
+        
+        .text-primary {
+            color: var(--color-paprika) !important;
+        }
+        
+        .text-info {
+            color: var(--color-honey) !important;
+        }
+        
+        .text-warning {
+            color: var(--color-pumpkin) !important;
+        }
+        
+        /* Mejora de contraste para iconos grandes */
+        .fs-1 {
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+        }
+        
+        /* Asegurar que los botones tengan buen contraste */
+        .btn {
+            font-weight: 600;
+            border-width: 2px;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--color-pumpkin), var(--color-honey));
+            border-color: var(--color-pumpkin);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-pumpkin));
+            border-color: var(--color-honey);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 117, 24, 0.4);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-cream));
+            border-color: var(--color-honey);
+            color: var(--color-cinnamon);
+            font-weight: bold;
+        }
+        
+        .btn-info:hover {
+            background: linear-gradient(135deg, var(--color-cream), var(--color-honey));
+            border-color: var(--color-paprika);
+            color: var(--color-cinnamon);
+            transform: translateY(-2px);
+        }
+        
+        /* Mejorar visibilidad de cards de acción */
+        .card.h-100 {
+            border: 2px solid var(--color-honey);
+            transition: all 0.3s ease;
+        }
+        
+        .card.h-100:hover {
+            border-color: var(--color-paprika);
+            box-shadow: 0 8px 20px rgba(165, 82, 45, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'recipe_list' %}">
+                <i class="bi bi-book"></i> MisRecetas
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'recipe_list' %}">
+                    <i class="bi bi-house"></i> Inicio
+                </a>
+                <a class="nav-link" href="{% url 'recipe_create' %}">
+                    <i class="bi bi-plus-circle"></i> Nueva Receta
+                </a>
+                <a class="nav-link" href="{% url 'my_recipes' %}">
+                    <i class="bi bi-person-circle"></i> Mis Recetas
+                </a>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-4">
+                    <i class="bi bi-person-circle"></i> 
+                    ¡Bienvenido, {{ request.user.username }}!
+                </h2>
+            </div>
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-plus-circle fs-1 text-success"></i>
+                        <h5 class="card-title mt-2">Crear Receta</h5>
+                        <p class="card-text">Comparte una nueva receta con la comunidad</p>
+                        <a href="{% url 'recipe_create' %}" class="btn btn-success">Crear Ahora</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-search fs-1 text-primary"></i>
+                        <h5 class="card-title mt-2">Explorar Recetas</h5>
+                        <p class="card-text">Descubre nuevas recetas de otros usuarios</p>
+                        <a href="{% url 'recipe_list' %}" class="btn btn-primary">Explorar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-basket fs-1 text-warning"></i>
+                        <h5 class="card-title mt-2">Buscar por Ingredientes</h5>
+                        <p class="card-text">Encuentra recetas con ingredientes que tienes</p>
+                        <a href="{% url 'search_by_ingredients' %}" class="btn btn-warning">Buscar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-lightbulb fs-1 text-purple"></i>
+                        <h5 class="card-title mt-2">Recomendaciones</h5>
+                        <p class="card-text">Descubre recetas personalizadas para ti</p>
+                        <a href="{% url 'recommendations' %}" class="btn btn-purple" style="background-color: #6f42c1; border-color: #6f42c1; color: white;">Ver Recomendaciones</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-collection fs-1 text-info"></i>
+                        <h5 class="card-title mt-2">Mis Recetas</h5>
+                        <p class="card-text">Gestiona tus recetas publicadas</p>
+                        <a href="{% url 'my_recipes' %}" class="btn btn-info">Ver Mis Recetas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tus recetas recientes -->
+        {% if user_recipes %}
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h4><i class="bi bi-clock-history"></i> Tus Recetas Recientes</h4>
+                <div class="row">
+                    {% for recipe in user_recipes %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            {% if recipe.images.all %}
+                                <img src="{{ recipe.images.first.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ recipe.title }}">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-image fs-1 text-muted"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ recipe.title }}</h6>
+                                <p class="card-text text-muted small">{{ recipe.description|truncatewords:10 }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                    <a href="{% url 'recipe_edit' recipe.id %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recetas populares -->
+        {% if popular_recipes %}
+        <div class="row">
+            <div class="col-md-12">
+                <h4><i class="bi bi-heart-fill text-danger"></i> Recetas Populares</h4>
+                <div class="row">
+                    {% for recipe in popular_recipes %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            {% if recipe.images.all %}
+                                <img src="{{ recipe.images.first.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ recipe.title }}">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-image fs-1 text-muted"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ recipe.title }}</h6>
+                                <p class="card-text text-muted small">Por: {{ recipe.author.username }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-sm btn-outline-primary">Ver Receta</a>
+                                    <span class="text-muted small">
+                                        <i class="bi bi-heart-fill text-danger"></i> {{ recipe.likes_count }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

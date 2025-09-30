@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preferencias - MisRecetas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'recipe_list' %}">
+                <i class="bi bi-book"></i> MisRecetas
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'recommendations' %}">
+                    <i class="bi bi-arrow-left"></i> Volver a Recomendaciones
+                </a>
+                <a class="nav-link" href="{% url 'user_panel' %}">
+                    <i class="bi bi-house"></i> Panel
+                </a>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-4">
+                    <i class="bi bi-gear"></i> 
+                    Personalizar Preferencias
+                </h2>
+                <p class="text-muted">
+                    Configura tus gustos culinarios para recibir mejores recomendaciones personalizadas.
+                </p>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <!-- Etiquetas favoritas -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5><i class="bi bi-tags text-success"></i> Etiquetas Favoritas</h5>
+                            <small class="text-muted">Selecciona los tipos de recetas que más te gustan</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for tag in all_tags %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="favorite_tags" 
+                                               value="{{ tag.id }}" id="tag_{{ tag.id }}"
+                                               {% if tag in preferences.favorite_tags.all %}checked{% endif %}>
+                                        <label class="form-check-label" for="tag_{{ tag.id }}">
+                                            <span class="badge" style="background-color: {{ tag.color }};">{{ tag.name }}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <small class="form-text text-muted">
+                                Las recetas con estas etiquetas tendrán prioridad en tus recomendaciones.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ingredientes favoritos -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5><i class="bi bi-basket text-warning"></i> Ingredientes Favoritos</h5>
+                            <small class="text-muted">Selecciona ingredientes que te gustan o usas frecuentemente</small>
+                        </div>
+                        <div class="card-body">
+                            <!-- Campo de búsqueda -->
+                            <input type="text" id="ingredient-search" class="form-control mb-3" 
+                                   placeholder="Buscar ingrediente...">
+                            
+                            <div id="ingredients-container" style="max-height: 400px; overflow-y: auto;">
+                                <div class="row">
+                                    {% for ingredient in all_ingredients %}
+                                    <div class="col-md-6 mb-2 ingredient-item">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="favorite_ingredients" 
+                                                   value="{{ ingredient.id }}" id="ingredient_{{ ingredient.id }}"
+                                                   {% if ingredient in preferences.favorite_ingredients.all %}checked{% endif %}>
+                                            <label class="form-check-label" for="ingredient_{{ ingredient.id }}">
+                                                {{ ingredient.name }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                Te recomendaremos recetas que usen estos ingredientes.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5><i class="bi bi-info-circle text-info"></i> ¿Cómo funcionan las recomendaciones?</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 text-center">
+                                    <i class="bi bi-heart-fill text-danger fs-2"></i>
+                                    <h6 class="mt-2">Historial de Likes</h6>
+                                    <small class="text-muted">Analizamos las recetas que te han gustado para encontrar patrones</small>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <i class="bi bi-search text-primary fs-2"></i>
+                                    <h6 class="mt-2">Búsquedas</h6>
+                                    <small class="text-muted">Consideramos qué ingredientes y recetas has buscado</small>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <i class="bi bi-gear text-success fs-2"></i>
+                                    <h6 class="mt-2">Preferencias</h6>
+                                    <small class="text-muted">Usamos las etiquetas e ingredientes que selecciones aquí</small>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <i class="bi bi-trending-up text-warning fs-2"></i>
+                                    <h6 class="mt-2">Popularidad</h6>
+                                    <small class="text-muted">También incluimos recetas populares de la comunidad</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'recommendations' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        
+                        <div>
+                            <button type="button" class="btn btn-outline-warning me-2" onclick="clearAllSelections()">
+                                <i class="bi bi-x-circle"></i> Limpiar Todo
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Guardar Preferencias
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Búsqueda en vivo de ingredientes
+        document.getElementById('ingredient-search').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const ingredientItems = document.querySelectorAll('.ingredient-item');
+            
+            ingredientItems.forEach(function(item) {
+                const label = item.querySelector('label').textContent.toLowerCase();
+                if (label.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Limpiar todas las selecciones
+        function clearAllSelections() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = false;
+            });
+            document.getElementById('ingredient-search').value = '';
+            
+            // Mostrar todos los ingredientes
+            const ingredientItems = document.querySelectorAll('.ingredient-item');
+            ingredientItems.forEach(function(item) {
+                item.style.display = 'block';
+            });
+        }
+
+        // Contador de selecciones
+        function updateCounters() {
+            const tagCheckboxes = document.querySelectorAll('input[name="favorite_tags"]:checked');
+            const ingredientCheckboxes = document.querySelectorAll('input[name="favorite_ingredients"]:checked');
+            
+            console.log(`Etiquetas seleccionadas: ${tagCheckboxes.length}`);
+            console.log(`Ingredientes seleccionados: ${ingredientCheckboxes.length}`);
+        }
+
+        // Escuchar cambios en los checkboxes
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox') {
+                updateCounters();
+            }
+        });
+
+        // Inicializar contador
+        updateCounters();
+    </script>
+</body>
+</html>

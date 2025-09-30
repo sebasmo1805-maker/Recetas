@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Recetas - MisRecetas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --color-cream: #FAE6B1;
+            --color-orange: #FFA101;
+            --color-light-blue: #B3DEE5;
+            --color-dark-blue: #31525B;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--color-light-blue) 0%, rgba(179, 222, 229, 0.3) 35%, var(--color-cream) 70%, rgba(255, 161, 1, 0.1) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            color: var(--color-dark-blue);
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--color-dark-blue), rgba(49, 82, 91, 0.9)) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(49, 82, 91, 0.3);
+            border-bottom: 1px solid var(--color-light-blue);
+        }
+        
+        .navbar-brand, .nav-link {
+            color: white !important;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--color-cream) !important;
+            transform: translateY(-1px);
+        }
+        
+        h2 {
+            color: var(--color-dark-blue);
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(49, 82, 91, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--color-orange), #ff8800);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 161, 1, 0.3);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #ff8800, var(--color-orange));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 161, 1, 0.4);
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(179, 222, 229, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(49, 82, 91, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(49, 82, 91, 0.15);
+        }
+        
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+        
+        .card-title {
+            color: var(--color-dark-blue);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .card-text {
+            color: rgba(49, 82, 91, 0.8);
+            line-height: 1.6;
+        }
+        
+        .badge {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .badge.bg-success {
+            background: linear-gradient(135deg, #28a745, #20c997) !important;
+        }
+        
+        .badge.bg-warning {
+            background: linear-gradient(135deg, var(--color-orange), #ff8800) !important;
+        }
+        
+        .btn-group .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--color-light-blue);
+            color: var(--color-dark-blue);
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--color-light-blue);
+            border-color: var(--color-light-blue);
+            color: var(--color-dark-blue);
+        }
+        
+        .btn-outline-secondary {
+            border-color: var(--color-orange);
+            color: var(--color-orange);
+        }
+        
+        .btn-outline-secondary:hover {
+            background: var(--color-orange);
+            border-color: var(--color-orange);
+            color: white;
+        }
+        
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            transform: translateY(-1px);
+        }
+        
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05));
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05));
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .no-recipes {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(49, 82, 91, 0.1);
+            margin: 2rem 0;
+        }
+        
+        .no-recipes i {
+            font-size: 4rem;
+            color: var(--color-light-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .no-recipes h3 {
+            color: var(--color-dark-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .no-recipes p {
+            color: rgba(49, 82, 91, 0.7);
+            margin-bottom: 2rem;
+        }
+        
+        /* Animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .card:nth-child(even) {
+            animation-delay: 0.1s;
+        }
+        
+        .card:nth-child(odd) {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'recipe_list' %}">
+                <i class="bi bi-book"></i> MisRecetas
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'recipe_list' %}">
+                    <i class="bi bi-search"></i> Explorar
+                </a>
+                <a class="nav-link" href="{% url 'user_panel' %}">
+                    <i class="bi bi-house"></i> Panel
+                </a>
+                <a class="nav-link" href="{% url 'recipe_create' %}">
+                    <i class="bi bi-plus-circle"></i> Nueva Receta
+                </a>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="bi bi-collection"></i> 
+                        Mis Recetas
+                    </h2>
+                    <a href="{% url 'recipe_create' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Crear Nueva Receta
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if page_obj %}
+            <div class="row">
+                {% for recipe in page_obj %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if recipe.images.all %}
+                            <img src="{{ recipe.images.first.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="{{ recipe.title }}">
+                        {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="bi bi-image fs-1 text-muted"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ recipe.title }}</h5>
+                            <p class="card-text">{{ recipe.description|truncatewords:15 }}</p>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> {{ recipe.created_at|date:"d M Y" }}<br>
+                                    <i class="bi bi-clock"></i> {{ recipe.total_time }} min
+                                    <i class="bi bi-people ms-2"></i> {{ recipe.servings }} porciones<br>
+                                    <i class="bi bi-heart-fill text-danger"></i> {{ recipe.likes_count }} me gusta
+                                    <span class="badge bg-{% if recipe.difficulty == 'facil' %}success{% elif recipe.difficulty == 'intermedio' %}warning{% else %}danger{% endif %} ms-2">
+                                        {{ recipe.get_difficulty_display }}
+                                    </span>
+                                </small>
+                            </div>
+
+                            <!-- Etiquetas -->
+                            {% if recipe.tags.all %}
+                            <div class="mb-2">
+                                {% for tag in recipe.tags.all %}
+                                <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <!-- Estado de publicación -->
+                            <div class="mb-2">
+                                {% if recipe.is_published %}
+                                    <span class="badge bg-success"><i class="bi bi-check-circle"></i> Publicada</span>
+                                {% else %}
+                                    <span class="badge bg-warning"><i class="bi bi-clock"></i> Borrador</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <div class="btn-group w-100" role="group">
+                                    <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                    <a href="{% url 'recipe_edit' recipe.id %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <a href="{% url 'recipe_delete' recipe.id %}" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if page_obj.has_other_pages %}
+            <div class="row">
+                <div class="col-md-12">
+                    <nav aria-label="Navegación de mis recetas">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                        <i class="bi bi-chevron-left"></i> Anterior
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                        Siguiente <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+
+        {% else %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="no-recipes">
+                        <i class="bi bi-collection"></i>
+                        <h3>Aún no tienes recetas</h3>
+                        <p>¡Empieza compartiendo tu primera receta con la comunidad!</p>
+                        <a href="{% url 'recipe_create' %}" class="btn btn-success">
+                            <i class="bi bi-plus-circle"></i> Crear Mi Primera Receta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

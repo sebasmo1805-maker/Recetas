@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorar Recetas - MisRecetas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --color-cream: #FFF8DC;  /* Vainilla/Crema */
+            --color-honey: #FFB347;   /* Miel/Dorado */
+            --color-paprika: #D2691E; /* Tomate/Paprika */
+            --color-cinnamon: #A0522D; /* Canela */
+            --color-pumpkin: #FF7518;  /* Calabaza */
+            --color-pepper: #C65D07;   /* Pimentón */
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--color-cream), #fff);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--color-cinnamon), var(--color-paprika)) !important;
+            box-shadow: 0 2px 10px rgba(165, 82, 45, 0.3);
+        }
+        
+        .navbar-brand {
+            color: var(--color-cream) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            color: var(--color-cream) !important;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            color: var(--color-honey) !important;
+            transform: translateY(-1px);
+        }
+        
+        .card {
+            border: 2px solid var(--color-honey);
+            box-shadow: 0 6px 15px rgba(165, 82, 45, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(165, 82, 45, 0.25);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-cream));
+            border-bottom: 2px solid var(--color-paprika);
+            color: var(--color-cinnamon);
+            font-weight: bold;
+        }
+        
+        .card-body {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-paprika), var(--color-pepper));
+            border-color: var(--color-paprika);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--color-pepper), var(--color-paprika));
+            border-color: var(--color-pepper);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(210, 105, 30, 0.4);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--color-paprika);
+            color: var(--color-paprika);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--color-paprika);
+            border-color: var(--color-paprika);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--color-cinnamon), var(--color-pepper));
+            border-color: var(--color-cinnamon);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, var(--color-pepper), var(--color-cinnamon));
+            transform: translateY(-2px);
+        }
+        
+        .form-control:focus {
+            border-color: var(--color-paprika);
+            box-shadow: 0 0 0 0.2rem rgba(210, 105, 30, 0.25);
+        }
+        
+        .form-select:focus {
+            border-color: var(--color-paprika);
+            box-shadow: 0 0 0 0.2rem rgba(210, 105, 30, 0.25);
+        }
+        
+        .badge {
+            background-color: var(--color-paprika) !important;
+            color: white;
+        }
+        
+        .recipe-card .card-title {
+            color: var(--color-cinnamon);
+            font-weight: bold;
+        }
+        
+        .recipe-card .text-muted {
+            color: var(--color-cinnamon) !important;
+            opacity: 0.7;
+        }
+        
+        .recipe-stats {
+            background: linear-gradient(45deg, var(--color-honey), var(--color-cream));
+            border-radius: 15px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        
+        .like-btn {
+            color: var(--color-paprika);
+            border: none;
+            background: none;
+            font-size: 1.2rem;
+        }
+        
+        .like-btn.liked {
+            color: #dc3545;
+        }
+        
+        .pagination .page-link {
+            color: var(--color-cinnamon);
+            border-color: var(--color-honey);
+        }
+        
+        .pagination .page-link:hover {
+            background-color: var(--color-honey);
+            border-color: var(--color-paprika);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--color-paprika);
+            border-color: var(--color-paprika);
+        }
+        
+        h1, h2, h3 {
+            color: var(--color-cinnamon);
+            text-shadow: 1px 1px 2px rgba(165, 82, 45, 0.1);
+        }
+        
+        .alert-success {
+            background-color: var(--color-honey);
+            border-color: var(--color-paprika);
+            color: var(--color-cinnamon);
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .recipe-image {
+            border-radius: 10px;
+            border: 3px solid var(--color-honey);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'recipe_list' %}">
+                <i class="bi bi-book"></i> MisRecetas
+            </a>
+            <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    {% if user.role == 'admin' %}
+                        <!-- Navegación para Administradores -->
+                        <a class="nav-link" href="{% url 'admin_panel' %}">
+                            <i class="bi bi-shield-check"></i> Panel Admin
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_users' %}">
+                            <i class="bi bi-people"></i> Usuarios
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_recipes' %}">
+                            <i class="bi bi-journal-text"></i> Recetas
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_ingredients' %}">
+                            <i class="bi bi-egg"></i> Ingredientes
+                        </a>
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        </a>
+                    {% else %}
+                        <!-- Navegación para Usuarios Normales -->
+                        <a class="nav-link" href="{% url 'user_panel' %}">
+                            <i class="bi bi-house"></i> Panel
+                        </a>
+                        <a class="nav-link" href="{% url 'recipe_create' %}">
+                            <i class="bi bi-plus-circle"></i> Nueva Receta
+                        </a>
+                        <a class="nav-link" href="{% url 'recommendations' %}">
+                            <i class="bi bi-lightbulb"></i> Recomendaciones
+                        </a>
+                        <a class="nav-link" href="{% url 'my_recipes' %}">
+                            <i class="bi bi-person-circle"></i> Mis Recetas
+                        </a>
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">
+                        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                    </a>
+                    <a class="nav-link" href="{% url 'register' %}">
+                        <i class="bi bi-person-plus"></i> Registrarse
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-4">
+                    <i class="bi bi-search"></i> 
+                    Explorar Recetas
+                </h2>
+            </div>
+        </div>
+
+        <!-- Filtros de búsqueda -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-funnel"></i> Filtros de Búsqueda</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-4">
+                                {{ form.query.label_tag }}
+                                {{ form.query }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.difficulty.label_tag }}
+                                {{ form.difficulty }}
+                            </div>
+                            <div class="col-md-3">
+                                <label>Ordenar por:</label>
+                                <select name="sort" class="form-control">
+                                    <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Más recientes</option>
+                                    <option value="likes" {% if sort_by == 'likes' %}selected{% endif %}>Más populares</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search"></i> Buscar
+                                </button>
+                            </div>
+                            {% if form.tags %}
+                            <div class="col-md-12">
+                                {{ form.tags.label_tag }}
+                                <div class="row">
+                                    {% for choice in form.tags %}
+                                    <div class="col-md-2">
+                                        {{ choice.tag }}
+                                        {{ choice.choice_label }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enlaces adicionales -->
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <a href="{% url 'search_by_ingredients' %}" class="btn btn-outline-warning me-2">
+                    <i class="bi bi-basket"></i> Buscar por Ingredientes
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'recipe_create' %}" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Crear Nueva Receta
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Lista de recetas -->
+        <div class="row">
+            {% for recipe in page_obj %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if recipe.images.all %}
+                        <img src="{{ recipe.images.first.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="{{ recipe.title }}">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <i class="bi bi-image fs-1 text-muted"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ recipe.title }}</h5>
+                        <p class="card-text">{{ recipe.description|truncatewords:15 }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                Por: <strong>{{ recipe.author.username }}</strong><br>
+                                <i class="bi bi-clock"></i> {{ recipe.total_time }} min
+                                <i class="bi bi-people ms-2"></i> {{ recipe.servings }} porciones
+                                <i class="bi bi-heart-fill text-danger ms-2"></i> {{ recipe.likes_count }}
+                            </small>
+                        </p>
+                        
+                        <!-- Etiquetas -->
+                        {% if recipe.tags.all %}
+                        <div class="mb-2">
+                            {% for tag in recipe.tags.all %}
+                            <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mt-auto">
+                            <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary w-100">
+                                <i class="bi bi-eye"></i> Ver Receta
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-md-12">
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle fs-1"></i>
+                    <h4>No se encontraron recetas</h4>
+                    <p>No hay recetas que coincidan con tu búsqueda.</p>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'recipe_create' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> ¡Sé el primero en crear una receta!
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Paginación -->
+        {% if page_obj.has_other_pages %}
+        <div class="row">
+            <div class="col-md-12">
+                <nav aria-label="Navegación de recetas">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.difficulty %}&difficulty={{ request.GET.difficulty }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                                    <i class="bi bi-chevron-left"></i> Anterior
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.difficulty %}&difficulty={{ request.GET.difficulty }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.difficulty %}&difficulty={{ request.GET.difficulty }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                                    Siguiente <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

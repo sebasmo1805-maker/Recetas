@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Eliminación de Receta - Panel Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'admin_panel' %}">
+                <i class="bi bi-shield-check"></i> Panel de Administración
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'admin_recipes' %}">
+                    <i class="bi bi-arrow-left"></i> Volver a Recetas
+                </a>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h4 class="mb-0">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            Confirmar Eliminación de Receta
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <h5><i class="bi bi-exclamation-triangle"></i> ¡Atención!</h5>
+                            <p class="mb-0">Esta acción <strong>NO SE PUEDE DESHACER</strong>. La receta y todos sus datos serán eliminados permanentemente.</p>
+                        </div>
+
+                        <h5>¿Estás seguro de eliminar la siguiente receta?</h5>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        {% if recipe_to_delete.images.all %}
+                                            <img src="{{ recipe_to_delete.images.first.image.url }}" 
+                                                 class="img-fluid rounded" 
+                                                 alt="{{ recipe_to_delete.title }}">
+                                        {% else %}
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                 style="height: 200px;">
+                                                <i class="bi bi-image text-muted fs-1"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>{{ recipe_to_delete.title }}</h5>
+                                        {% if recipe_to_delete.description %}
+                                            <p class="text-muted">{{ recipe_to_delete.description|truncatechars:150 }}</p>
+                                        {% endif %}
+                                        
+                                        <p><strong>Autor:</strong> {{ recipe_to_delete.author.username }}</p>
+                                        <p><strong>Fecha de creación:</strong> {{ recipe_to_delete.created_at|date:"d M Y H:i" }}</p>
+                                        <p><strong>Estado:</strong> 
+                                            {% if recipe_to_delete.is_published %}
+                                                <span class="badge bg-success">Publicada</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Oculta</span>
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Me gusta recibidos:</strong> 
+                                            <span class="badge bg-danger">{{ recipe_to_delete.likes_count }}</span>
+                                        </p>
+                                        
+                                        {% if recipe_to_delete.tags.all %}
+                                        <p><strong>Etiquetas:</strong>
+                                            {% for tag in recipe_to_delete.tags.all %}
+                                                <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+                                            {% endfor %}
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning mt-3">
+                            <h6><i class="bi bi-exclamation-triangle"></i> Datos que se eliminarán:</h6>
+                            <ul class="mb-0">
+                                <li>La receta y toda su información</li>
+                                <li>Todas las imágenes asociadas</li>
+                                <li>Los ingredientes y cantidades</li>
+                                <li>Todos los "me gusta" recibidos</li>
+                                <li>Referencias en recomendaciones</li>
+                                <li>Historial de búsquedas relacionadas</li>
+                            </ul>
+                        </div>
+
+                        <form method="POST" class="mt-4">
+                            {% csrf_token %}
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'admin_recipes' %}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <div>
+                                    <a href="{% url 'recipe_detail' recipe_to_delete.id %}" 
+                                       class="btn btn-info me-2" target="_blank">
+                                        <i class="bi bi-eye"></i> Ver Receta
+                                    </a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-trash"></i> Confirmar Eliminación
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

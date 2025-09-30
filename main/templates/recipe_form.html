@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - MisRecetas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <!-- Bootstrap Select para búsqueda de ingredientes -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+    <style>
+        :root {
+            --color-cream: #FFF8DC;  /* Vainilla/Crema */
+            --color-honey: #FFB347;   /* Miel/Dorado */
+            --color-paprika: #D2691E; /* Tomate/Paprika */
+            --color-cinnamon: #A0522D; /* Canela */
+            --color-pumpkin: #FF7518;  /* Calabaza */
+            --color-pepper: #C65D07;   /* Pimentón */
+        }
+        .navbar-brand { color: var(--color-cream) !important; font-weight: bold; }
+        .navbar { background: linear-gradient(135deg, var(--color-cinnamon), var(--color-paprika)) !important; }
+        .nav-link { color: var(--color-cream) !important; }
+        .nav-link:hover { color: var(--color-honey) !important; }
+
+        .card { border: 2px solid var(--color-honey); box-shadow: 0 4px 8px rgba(165,82,45,.1); }
+        .card-header {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-cream));
+            border-bottom: 2px solid var(--color-paprika); color: var(--color-cinnamon); font-weight: bold;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, var(--color-paprika), var(--color-pepper)); border-color: var(--color-paprika); color:#fff; font-weight: bold; }
+        .btn-primary:hover { background: linear-gradient(135deg, var(--color-pepper), var(--color-paprika)); border-color: var(--color-pepper); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(210,105,30,.3); }
+        .btn-success { background: linear-gradient(135deg, var(--color-cinnamon), var(--color-pepper)); border-color: var(--color-cinnamon); }
+        .btn-success:hover { background: linear-gradient(135deg, var(--color-pepper), var(--color-cinnamon)); border-color: var(--color-pepper); transform: translateY(-1px); }
+        .btn-outline-danger { border-color:#dc3545; color:#dc3545; }
+        .btn-outline-danger:hover { background-color:#dc3545; border-color:#dc3545; transform: translateY(-1px); }
+
+        .form-control:focus { border-color: var(--color-paprika); box-shadow: 0 0 0 .2rem rgba(210,105,30,.25); }
+        .form-check-input:checked { background-color: var(--color-paprika); border-color: var(--color-paprika); }
+
+        .ingredient-marked-for-deletion, .image-marked-for-deletion {
+            opacity:.6; background:#f8d7da; border-left:4px solid #dc3545; padding-left:15px; border-radius:5px;
+        }
+        .ingredient-marked-for-deletion input, .ingredient-marked-for-deletion select,
+        .image-marked-for-deletion input[type="file"], .image-marked-for-deletion input[type="text"] { text-decoration: line-through; }
+
+        body { background: linear-gradient(135deg, var(--color-cream), #fff); min-height: 100vh; }
+        h2 { color: var(--color-cinnamon); text-shadow: 1px 1px 2px rgba(165,82,45,.1); }
+        .alert-success { background: var(--color-honey); border-color: var(--color-paprika); color: var(--color-cinnamon); }
+        .alert-danger  { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+
+        /* Bootstrap Select personalizado */
+        .bootstrap-select .dropdown-toggle { border-color: var(--color-light-blue); }
+        .bootstrap-select .dropdown-toggle:focus { border-color: var(--color-orange); box-shadow: 0 0 0 .2rem rgba(255,161,1,.25); }
+        .bootstrap-select .dropdown-menu { border-color: var(--color-light-blue); }
+        .bootstrap-select .dropdown-item:hover { background: var(--color-light-blue); color: var(--color-dark-blue); }
+        .bootstrap-select .dropdown-item.active { background: var(--color-orange); color:#fff; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'recipe_list' %}">
+            <i class="bi bi-book"></i> MisRecetas
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="{% url 'recipe_list' %}">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            <a class="nav-link" href="{% url 'user_panel' %}">
+                <i class="bi bi-house"></i> Panel
+            </a>
+            <a class="nav-link" href="{% url 'logout' %}">
+                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row"><div class="col-md-12">
+        <h2><i class="bi bi-{% if recipe %}pencil{% else %}plus-circle{% endif %}"></i> {{ title }}</h2><hr>
+    </div></div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <!-- Columna izquierda -->
+            <div class="col-md-8">
+                <!-- Información básica -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-info-circle"></i> Información Básica</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {{ form.title.label_tag }} {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger">{{ form.title.errors }}</div>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.description.label_tag }} {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger">{{ form.description.errors }}</div>{% endif %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    {{ form.prep_time.label_tag }} {{ form.prep_time }}
+                                    {% if form.prep_time.errors %}<div class="text-danger">{{ form.prep_time.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    {{ form.cook_time.label_tag }} {{ form.cook_time }}
+                                    {% if form.cook_time.errors %}<div class="text-danger">{{ form.cook_time.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    {{ form.servings.label_tag }} {{ form.servings }}
+                                    {% if form.servings.errors %}<div class="text-danger">{{ form.servings.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    {{ form.difficulty.label_tag }} {{ form.difficulty }}
+                                    {% if form.difficulty.errors %}<div class="text-danger">{{ form.difficulty.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instrucciones -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-list-ol"></i> Instrucciones de Preparación</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ form.instructions.label_tag }} {{ form.instructions }}
+                        {% if form.instructions.errors %}<div class="text-danger">{{ form.instructions.errors }}</div>{% endif %}
+                        <small class="form-text text-muted">Escribe paso a paso cómo preparar la receta. Puedes usar números o viñetas.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna derecha -->
+            <div class="col-md-4">
+                <!-- Etiquetas -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-tags"></i> Etiquetas</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ form.tags.label_tag }}
+                        <div class="tags-container" style="max-height:200px; overflow-y:auto;">
+                            {% for choice in form.tags %}
+                              <div class="form-check">{{ choice.tag }} {{ choice.choice_label }}</div>
+                            {% endfor %}
+                        </div>
+                        {% if form.tags.errors %}<div class="text-danger">{{ form.tags.errors }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingredientes -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="bi bi-basket"></i> Ingredientes</h5>
+                <button type="button" class="btn btn-sm btn-success" onclick="addIngredientForm()">
+                    <i class="bi bi-plus"></i> Agregar Ingrediente
+                </button>
+            </div>
+            <div class="card-body">
+                {{ ingredient_formset.management_form }}
+
+                <!-- Prototipo oculto para clonación -->
+                <div id="ingredient-empty-form" class="ingredient-form d-none">
+                    <div class="row mb-3 align-items-end">
+                        <div class="col-md-5">
+                        {{ ingredient_formset.empty_form.ingredient.label_tag }}
+                        {{ ingredient_formset.empty_form.ingredient }}
+                        </div>
+                        <div class="col-md-5">
+                        {{ ingredient_formset.empty_form.quantity.label_tag }}
+                        {{ ingredient_formset.empty_form.quantity }}
+                        </div>
+                        <div class="col-md-2">
+                        <div class="form-check" style="display:none;">
+                            {{ ingredient_formset.empty_form.DELETE }}
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-sm delete-ingredient-btn" data-delete-checkbox="">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                        {{ ingredient_formset.empty_form.id }}
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div id="ingredient-forms">
+                    {% for form in ingredient_formset %}
+                      {% if not recipe or form.instance.pk %}
+                        <div class="ingredient-form row mb-3 align-items-end">
+                            <div class="col-md-5">
+                                {{ form.ingredient.label_tag }} {{ form.ingredient }}
+                                {% if form.ingredient.errors %}<div class="text-danger">{{ form.ingredient.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-5">
+                                {{ form.quantity.label_tag }} {{ form.quantity }}
+                                {% if form.quantity.errors %}<div class="text-danger">{{ form.quantity.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-2">
+                                {% if form.DELETE %}
+                                  <div class="form-check" style="display:none;">{{ form.DELETE }}</div>
+                                  <button type="button" class="btn btn-outline-danger btn-sm delete-ingredient-btn"
+                                          data-delete-checkbox="{{ form.DELETE.id_for_label }}">
+                                      <i class="bi bi-trash"></i> Eliminar
+                                  </button>
+                                {% endif %}
+                                {{ form.id }}
+                            </div>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                </div>
+                <small class="form-text text-muted">
+                    Especifica la cantidad exacta (ej: 2 tazas, 500g, 3 unidades, al gusto)
+                </small>
+            </div>
+        </div>
+
+        <!-- Imágenes -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="bi bi-images"></i> Imágenes</h5>
+                <button type="button" class="btn btn-sm btn-success" onclick="addImageForm()">
+                    <i class="bi bi-plus"></i> Agregar Imagen
+                </button>
+            </div>
+            <div class="card-body">
+                {{ image_formset.management_form }}
+
+                <!-- Prototipo oculto para clonación -->
+                <div id="image-empty-form" class="image-form d-none">
+                    <div class="row mb-3 align-items-end">
+                        <div class="col-md-4">
+                            {{ image_formset.empty_form.image.label_tag }}
+                            {{ image_formset.empty_form.image }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ image_formset.empty_form.caption.label_tag }}
+                            {{ image_formset.empty_form.caption }}
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                {{ image_formset.empty_form.is_main }}
+                                {{ image_formset.empty_form.is_main.label_tag }}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check" style="display:none;">
+                                {{ image_formset.empty_form.DELETE }}
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-image-btn" data-delete-checkbox="">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                            {{ image_formset.empty_form.id }}
+                        </div>
+                    </div>
+                </div>
+
+                <div id="image-forms">
+                    {% for form in image_formset %}
+                      {% if not recipe or form.instance.pk %}
+                        <div class="image-form row mb-3 align-items-end">
+                            <div class="col-md-4">
+                                {{ form.image.label_tag }} {{ form.image }}
+                                {% if form.instance.pk and form.instance.image %}
+                                  <div class="mt-2">
+                                      <img src="{{ form.instance.image.url }}" alt="Actual" style="max-height:100px; border:1px solid #eee; border-radius:6px;">
+                                      <div class="small text-muted mt-1">Deja vacío para mantener la imagen actual.</div>
+                                  </div>
+                                {% endif %}
+                                {% if form.image.errors %}<div class="text-danger">{{ form.image.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.caption.label_tag }} {{ form.caption }}
+                                {% if form.caption.errors %}<div class="text-danger">{{ form.caption.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-check">
+                                    {{ form.is_main }} {{ form.is_main.label_tag }}
+                                </div>
+                                {% if form.is_main.errors %}<div class="text-danger">{{ form.is_main.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-2">
+                                {% if form.DELETE %}
+                                  <div class="form-check" style="display:none;">{{ form.DELETE }}</div>
+                                  <button type="button" class="btn btn-outline-danger btn-sm delete-image-btn"
+                                          data-delete-checkbox="{{ form.DELETE.id_for_label }}">
+                                      <i class="bi bi-trash"></i> Eliminar
+                                  </button>
+                                {% endif %}
+                                {{ form.id }}
+                            </div>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                </div>
+                <small class="form-text text-muted">Se recomienda subir al menos una imagen para que tu receta sea más atractiva.</small>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between">
+                    <a href="{% if recipe %}{% url 'recipe_detail' recipe.id %}{% else %}{% url 'user_panel' %}{% endif %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> {% if recipe %}Actualizar Receta{% else %}Crear Receta{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/i18n/defaults-es_ES.min.js"></script>
+
+<script>
+  // Contadores iniciales desde el formset
+  let ingredientFormCount = {{ ingredient_formset.total_form_count }};
+  let imageFormCount      = {{ image_formset.total_form_count }};
+
+  $(function () {
+    // Inicializa selectpicker SOLO en los selects visibles (no en el prototipo oculto)
+    $('#ingredient-forms .ingredient-select').selectpicker({
+      liveSearch: true,
+      liveSearchPlaceholder: 'Buscar ingrediente...',
+      noneSelectedText: 'Selecciona un ingrediente',
+      noneResultsText: 'No se encontraron ingredientes que coincidan con {0}',
+      countSelectedText: (n) => (n === 1 ? '{0} ingrediente seleccionado' : '{0} ingredientes seleccionados')
+    });
+
+    handleDeleteButtons();
+    handleDeleteImageButtons();
+  });
+
+  // Utilidad: sustituye __prefix__ por el índice actual
+  function replacePrefix(html, prefix, index) {
+    const re = new RegExp(prefix + '-__prefix__-', 'g');
+    return html.replace(re, prefix + '-' + index + '-');
+  }
+
+  // Añadir INGREDIENTE
+  function addIngredientForm() {
+    const container = document.getElementById('ingredient-forms');
+    const tpl = document.getElementById('ingredient-empty-form').cloneNode(true);
+    tpl.classList.remove('d-none');
+
+    // Sustituir __prefix__ por el índice
+    tpl.innerHTML = replacePrefix(tpl.innerHTML, 'ingredient_set', ingredientFormCount);
+
+    // Por seguridad: si hubiera algún rastro de bootstrap-select, elimínalo
+    $(tpl).find('.bootstrap-select').remove();
+
+    // Asegura que el <select> tenga la clase para selectpicker
+    const $select = $(tpl).find('select').first();
+    $select.addClass('ingredient-select');
+
+    // Insertar en el DOM
+    container.appendChild(tpl);
+
+    // Inicializa selectpicker SOLO en este nuevo select
+    $select.selectpicker({
+      liveSearch: true,
+      liveSearchPlaceholder: 'Buscar ingrediente...',
+      noneSelectedText: 'Selecciona un ingrediente',
+      noneResultsText: 'No se encontraron ingredientes que coincidan con {0}',
+      countSelectedText: (n) => (n === 1 ? '{0} ingrediente seleccionado' : '{0} ingredientes seleccionados')
+    });
+
+    // Reengancha manejadores de eliminar
+    handleDeleteButtons();
+
+    // Actualiza contadores
+    ingredientFormCount++;
+    document.getElementById('id_ingredient_set-TOTAL_FORMS').value = ingredientFormCount;
+  }
+
+  // Añadir IMAGEN
+  function addImageForm() {
+    const container = document.getElementById('image-forms');
+    const tpl = document.getElementById('image-empty-form').cloneNode(true);
+    tpl.classList.remove('d-none');
+
+    tpl.innerHTML = replacePrefix(tpl.innerHTML, 'image_set', imageFormCount);
+    container.appendChild(tpl);
+
+    handleDeleteImageButtons();
+
+    imageFormCount++;
+    document.getElementById('id_image_set-TOTAL_FORMS').value = imageFormCount;
+  }
+
+  // Eliminar/Desmarcar ingrediente
+  function handleDeleteButtons() {
+    $('.delete-ingredient-btn').off('click').on('click', function () {
+      const id = $(this).data('delete-checkbox');
+      const checkbox = id ? document.getElementById(id) : null;
+      const row = $(this).closest('.ingredient-form');
+
+      if (checkbox) {
+        if (checkbox.checked) {
+          checkbox.checked = false;
+          row.removeClass('ingredient-marked-for-deletion');
+          $(this).removeClass('btn-danger').addClass('btn-outline-danger').html('<i class="bi bi-trash"></i> Eliminar');
+        } else {
+          checkbox.checked = true;
+          row.addClass('ingredient-marked-for-deletion');
+          $(this).removeClass('btn-outline-danger').addClass('btn-danger').html('<i class="bi bi-check"></i> Marcado para eliminar');
+        }
+      } else {
+        // Form nuevo: eliminar del DOM y ajustar TOTAL_FORMS
+        row.remove();
+        ingredientFormCount--;
+        document.getElementById('id_ingredient_set-TOTAL_FORMS').value = ingredientFormCount;
+      }
+    });
+  }
+
+  // Eliminar/Desmarcar imagen
+  function handleDeleteImageButtons() {
+    $('.delete-image-btn').off('click').on('click', function () {
+      const id = $(this).data('delete-checkbox');
+      const checkbox = id ? document.getElementById(id) : null;
+      const row = $(this).closest('.image-form');
+
+      if (checkbox) {
+        if (checkbox.checked) {
+          checkbox.checked = false;
+          row.removeClass('image-marked-for-deletion');
+          $(this).removeClass('btn-danger').addClass('btn-outline-danger').html('<i class="bi bi-trash"></i> Eliminar');
+        } else {
+          checkbox.checked = true;
+          row.addClass('image-marked-for-deletion');
+          $(this).removeClass('btn-outline-danger').addClass('btn-danger').html('<i class="bi bi-check"></i> Marcado para eliminar');
+        }
+      } else {
+        // Form nuevo: eliminar del DOM y ajustar TOTAL_FORMS
+        row.remove();
+        imageFormCount--;
+        document.getElementById('id_image_set-TOTAL_FORMS').value = imageFormCount;
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

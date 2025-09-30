@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Ingredientes - Panel Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'admin_panel' %}">
+                <i class="bi bi-shield-check"></i> Panel de Administración
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'admin_panel' %}">
+                    <i class="bi bi-arrow-left"></i> Volver al Panel
+                </a>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2>
+                            <i class="bi bi-egg text-warning"></i> 
+                            Gestión de Ingredientes
+                        </h2>
+                        <p class="lead">Administra los ingredientes disponibles para las recetas.</p>
+                    </div>
+                    <a href="{% url 'admin_ingredient_create' %}" class="btn btn-success btn-lg">
+                        <i class="bi bi-plus-circle"></i> Nuevo Ingrediente
+                    </a>
+                </div>
+                
+                <!-- Estadísticas rápidas -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <i class="bi bi-egg text-warning fs-2"></i>
+                                <h4 class="mt-2">{{ total_ingredients }}</h4>
+                                <p class="card-text">Total Ingredientes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-info">
+                            <div class="card-body text-center">
+                                <i class="bi bi-search text-info fs-2"></i>
+                                <h4 class="mt-2">{{ page_obj.paginator.count }}</h4>
+                                <p class="card-text">Resultados Actuales</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <i class="bi bi-graph-up text-success fs-2"></i>
+                                <h4 class="mt-2">Activos</h4>
+                                <p class="card-text">Todos Disponibles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Barra de búsqueda -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="GET" class="row g-3">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="search" 
+                                       placeholder="Buscar ingredientes por nombre..." 
+                                       value="{{ search }}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search"></i> Buscar
+                                </button>
+                            </div>
+                        </form>
+                        {% if search %}
+                        <div class="mt-2">
+                            <a href="{% url 'admin_ingredients' %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-x"></i> Limpiar búsqueda
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Lista de ingredientes -->
+                {% if page_obj %}
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Ingredientes Disponibles</h5>
+                        <span class="badge bg-warning">{{ page_obj.paginator.count }} ingredientes</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Usado en Recetas</th>
+                                        <th>Popularidad</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ingredient in page_obj %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-egg text-warning me-2"></i>
+                                                <strong>{{ ingredient.name }}</strong>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ ingredient.recipes.count }} receta{{ ingredient.recipes.count|pluralize }}</span>
+                                        </td>
+                                        <td>
+                                            {% with recipe_count=ingredient.recipes.count %}
+                                                {% if recipe_count >= 5 %}
+                                                    <span class="badge bg-success">Muy Popular</span>
+                                                {% elif recipe_count >= 2 %}
+                                                    <span class="badge bg-warning">Popular</span>
+                                                {% elif recipe_count == 1 %}
+                                                    <span class="badge bg-info">Poco Usado</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Sin Usar</span>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'admin_ingredient_edit' ingredient.id %}" 
+                                                   class="btn btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i> Editar
+                                                </a>
+                                                <a href="{% url 'admin_ingredient_delete' ingredient.id %}" 
+                                                   class="btn btn-outline-danger"
+                                                   onclick="return confirm('¿Estás seguro de eliminar este ingrediente?')">
+                                                    <i class="bi bi-trash"></i> Eliminar
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paginación -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Paginación de ingredientes" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}">Anterior</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}">Última</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+                {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle fs-1"></i>
+                    <h4>No se encontraron ingredientes</h4>
+                    {% if search %}
+                        <p>No hay ingredientes que coincidan con la búsqueda "{{ search }}".</p>
+                        <a href="{% url 'admin_ingredients' %}" class="btn btn-primary">Ver todos los ingredientes</a>
+                    {% else %}
+                        <p>Aún no hay ingredientes registrados. ¡Crea el primero!</p>
+                        <a href="{% url 'admin_ingredient_create' %}" class="btn btn-success">
+                            <i class="bi bi-plus-circle"></i> Crear Primer Ingrediente
+                        </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Ayuda -->
+                <div class="card mt-4 border-info">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="bi bi-info-circle"></i> Consejos para Gestionar Ingredientes</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-check-circle text-success"></i> Buenas Prácticas:</h6>
+                                <ul class="small">
+                                    <li>Usa nombres descriptivos y claros</li>
+                                    <li>Mantén consistencia en la nomenclatura</li>
+                                    <li>Evita duplicados con nombres similares</li>
+                                    <li>Revisa periódicamente ingredientes sin usar</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-exclamation-triangle text-warning"></i> Advertencias:</h6>
+                                <ul class="small">
+                                    <li>No puedes eliminar ingredientes usados en recetas</li>
+                                    <li>Los cambios afectan a todas las recetas existentes</li>
+                                    <li>Verifica antes de eliminar definitivamente</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

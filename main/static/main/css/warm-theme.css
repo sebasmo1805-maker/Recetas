@@ -1,0 +1,224 @@
+/* Paleta de Colores Cálidos Inspirada en Ingredientes */
+:root {
+    --color-cream: #FFF8DC;     /* Vainilla/Crema */
+    --color-honey: #FFB347;     /* Miel/Dorado */
+    --color-paprika: #D2691E;   /* Tomate/Paprika */
+    --color-cinnamon: #A0522D;  /* Canela */
+    --color-pumpkin: #FF7518;   /* Calabaza */
+    --color-pepper: #C65D07;    /* Pimentón */
+}
+
+/* Estilos Globales */
+body {
+    background: linear-gradient(135deg, var(--color-cream), #fff);
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Navegación */
+.navbar {
+    background: linear-gradient(135deg, var(--color-cinnamon), var(--color-paprika)) !important;
+    box-shadow: 0 2px 10px rgba(165, 82, 45, 0.3);
+}
+
+.navbar-brand {
+    color: var(--color-cream) !important;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: var(--color-cream) !important;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: var(--color-honey) !important;
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
+}
+
+/* Cards */
+.card {
+    border: 2px solid var(--color-honey);
+    box-shadow: 0 6px 15px rgba(165, 82, 45, 0.15);
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(165, 82, 45, 0.25);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--color-honey), var(--color-cream));
+    border-bottom: 2px solid var(--color-paprika);
+    color: var(--color-cinnamon);
+    font-weight: bold;
+}
+
+.card-body {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Botones */
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-paprika), var(--color-pepper));
+    border-color: var(--color-paprika);
+    color: white;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--color-pepper), var(--color-paprika));
+    border-color: var(--color-pepper);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(210, 105, 30, 0.4);
+}
+
+.btn-outline-primary {
+    border-color: var(--color-paprika);
+    color: var(--color-paprika);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--color-paprika);
+    border-color: var(--color-paprika);
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--color-cinnamon), var(--color-pepper));
+    border-color: var(--color-cinnamon);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--color-pepper), var(--color-cinnamon));
+    transform: translateY(-2px);
+}
+
+/* Formularios */
+.form-control:focus {
+    border-color: var(--color-paprika);
+    box-shadow: 0 0 0 0.2rem rgba(210, 105, 30, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--color-paprika);
+    box-shadow: 0 0 0 0.2rem rgba(210, 105, 30, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--color-paprika);
+    border-color: var(--color-paprika);
+}
+
+/* Elementos de texto */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-cinnamon);
+    text-shadow: 1px 1px 2px rgba(165, 82, 45, 0.1);
+}
+
+.text-muted {
+    color: var(--color-cinnamon) !important;
+    opacity: 0.7;
+}
+
+/* Badges */
+.badge {
+    background-color: var(--color-paprika) !important;
+    color: white;
+}
+
+/* Alertas */
+.alert-success {
+    background-color: var(--color-honey);
+    border-color: var(--color-paprika);
+    color: var(--color-cinnamon);
+}
+
+.alert-info {
+    background-color: var(--color-cream);
+    border-color: var(--color-honey);
+    color: var(--color-cinnamon);
+}
+
+/* Paginación */
+.pagination .page-link {
+    color: var(--color-cinnamon);
+    border-color: var(--color-honey);
+}
+
+.pagination .page-link:hover {
+    background-color: var(--color-honey);
+    border-color: var(--color-paprika);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--color-paprika);
+    border-color: var(--color-paprika);
+}
+
+/* Elementos específicos de recetas */
+.recipe-card .card-title {
+    color: var(--color-cinnamon);
+    font-weight: bold;
+}
+
+.recipe-stats {
+    background: linear-gradient(45deg, var(--color-honey), var(--color-cream));
+    border-radius: 15px;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+.like-btn {
+    color: var(--color-paprika);
+    border: none;
+    background: none;
+    font-size: 1.2rem;
+}
+
+.like-btn.liked {
+    color: #dc3545;
+}
+
+.recipe-image {
+    border-radius: 10px;
+    border: 3px solid var(--color-honey);
+}
+
+/* Admin Cards */
+.admin-card {
+    transition: all 0.3s ease;
+    border: 2px solid var(--color-honey);
+    box-shadow: 0 6px 15px rgba(165, 82, 45, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.admin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(165, 82, 45, 0.25);
+}
+
+/* Efectos hover generales */
+.card-title:hover, .nav-item:hover {
+    transition: all 0.3s ease;
+}
+
+/* Estados de borrado */
+.ingredient-marked-for-deletion, .image-marked-for-deletion {
+    opacity: 0.6;
+    background: #f8d7da;
+    border-left: 4px solid #dc3545;
+    padding-left: 15px;
+    border-radius: 5px;
+}
+
+.ingredient-marked-for-deletion input, 
+.ingredient-marked-for-deletion select,
+.image-marked-for-deletion input[type="file"], 
+.image-marked-for-deletion input[type="text"] {
+    text-decoration: line-through;
+}

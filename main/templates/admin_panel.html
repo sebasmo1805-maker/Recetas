@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - MisRecetas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --color-cream: #FFF8DC;  /* Vainilla/Crema */
+            --color-honey: #FFB347;   /* Miel/Dorado */
+            --color-paprika: #D2691E; /* Tomate/Paprika */
+            --color-cinnamon: #A0522D; /* Canela */
+            --color-pumpkin: #FF7518;  /* Calabaza */
+            --color-pepper: #C65D07;   /* Pimentón */
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--color-cream), #fff);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--color-cinnamon), var(--color-paprika)) !important;
+            box-shadow: 0 2px 10px rgba(165, 82, 45, 0.3);
+        }
+        
+        .navbar-brand {
+            color: var(--color-cream) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            color: var(--color-cream) !important;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            color: var(--color-honey) !important;
+            transform: translateY(-1px);
+        }
+        
+        .admin-card {
+            transition: all 0.3s ease;
+            border: 2px solid var(--color-honey);
+            box-shadow: 0 6px 15px rgba(165, 82, 45, 0.15);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(165, 82, 45, 0.25);
+            border-color: var(--color-paprika);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-cream));
+            border-bottom: 2px solid var(--color-paprika);
+            color: var(--color-cinnamon);
+            font-weight: bold;
+        }
+        
+        .stat-icon {
+            font-size: 3rem;
+            color: var(--color-paprika);
+            text-shadow: 2px 2px 4px rgba(165, 82, 45, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-paprika), var(--color-pepper));
+            border-color: var(--color-paprika);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--color-pepper), var(--color-paprika));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(210, 105, 30, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--color-cinnamon), var(--color-pepper));
+            border-color: var(--color-cinnamon);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, var(--color-pepper), var(--color-cinnamon));
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--color-pumpkin), var(--color-honey));
+            border-color: var(--color-pumpkin);
+            color: var(--color-cinnamon);
+            font-weight: bold;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-pumpkin));
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-cream));
+            border-color: var(--color-honey);
+            color: var(--color-cinnamon);
+            font-weight: bold;
+        }
+        
+        .btn-info:hover {
+            background: linear-gradient(135deg, var(--color-cream), var(--color-honey));
+            transform: translateY(-2px);
+        }
+        
+        h1, h2, h3 {
+            color: var(--color-cinnamon);
+            text-shadow: 1px 1px 2px rgba(165, 82, 45, 0.1);
+        }
+        
+        .welcome-admin {
+            background: linear-gradient(135deg, var(--color-honey), var(--color-cream));
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 3px solid var(--color-paprika);
+            text-align: center;
+        }
+        
+        .stat-card {
+            background: linear-gradient(45deg, white, var(--color-cream));
+            border: 2px solid var(--color-honey);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(165, 82, 45, 0.1);
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, var(--color-cinnamon), var(--color-paprika));
+            color: white;
+            border: none;
+        }
+        
+        .table tbody tr:hover {
+            background-color: var(--color-cream);
+        }
+        
+        .badge {
+            background-color: var(--color-paprika) !important;
+        }
+        
+        .badge.bg-success {
+            background: linear-gradient(135deg, var(--color-cinnamon), var(--color-pepper)) !important;
+        }
+        
+        .badge.bg-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333) !important;
+        }
+        
+        .text-muted {
+            color: var(--color-cinnamon) !important;
+            opacity: 0.7;
+        }
+        
+        .management-section {
+            background: linear-gradient(45deg, var(--color-honey), var(--color-cream));
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid var(--color-paprika);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'admin_panel' %}">
+                <i class="bi bi-shield-check"></i> Panel de Administración
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'recipe_list' %}">
+                    <i class="bi bi-house"></i> Inicio
+                </a>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="mb-4">
+                    <i class="bi bi-shield-check text-danger"></i> 
+                    Panel de Administración
+                </h1>
+                <p class="lead">Bienvenido, <strong>{{ request.user.username }}</strong>. Gestiona usuarios y contenido de la plataforma.</p>
+            </div>
+        </div>
+
+        <!-- Estadísticas principales -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card admin-card border-primary">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people stat-icon text-primary"></i>
+                        <h3 class="mt-2">{{ total_users }}</h3>
+                        <p class="card-text">Usuarios Registrados</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card admin-card border-success">
+                    <div class="card-body text-center">
+                        <i class="bi bi-book stat-icon text-success"></i>
+                        <h3 class="mt-2">{{ total_recipes }}</h3>
+                        <p class="card-text">Recetas Totales</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card admin-card border-warning">
+                    <div class="card-body text-center">
+                        <i class="bi bi-eye stat-icon text-warning"></i>
+                        <h3 class="mt-2">{{ published_recipes }}</h3>
+                        <p class="card-text">Recetas Publicadas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card admin-card border-danger">
+                    <div class="card-body text-center">
+                        <i class="bi bi-heart-fill stat-icon text-danger"></i>
+                        <h3 class="mt-2">{{ total_likes }}</h3>
+                        <p class="card-text">Total Me Gusta</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas adicionales -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card admin-card border-info">
+                    <div class="card-body text-center">
+                        <i class="bi bi-eye-slash stat-icon text-info"></i>
+                        <h3 class="mt-2">{{ unpublished_recipes }}</h3>
+                        <p class="card-text">Recetas Ocultas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card admin-card border-secondary">
+                    <div class="card-body text-center">
+                        <i class="bi bi-tags stat-icon text-secondary"></i>
+                        <h3 class="mt-2">{{ total_tags }}</h3>
+                        <p class="card-text">Etiquetas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card admin-card border-dark">
+                    <div class="card-body text-center">
+                        <i class="bi bi-egg stat-icon text-dark"></i>
+                        <h3 class="mt-2">{{ total_ingredients }}</h3>
+                        <p class="card-text">Ingredientes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card admin-card border-warning">
+                    <div class="card-body text-center">
+                        <i class="bi bi-graph-up stat-icon text-warning"></i>
+                        <h3 class="mt-2">
+                            {% if total_recipes > 0 %}
+                                {{ total_likes|floatformat:0 }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </h3>
+                        <p class="card-text">Promedio Likes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones de administración -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h3>Gestión de Contenido</h3>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card admin-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Gestionar Usuarios</h5>
+                        <p class="card-text">Activar, desactivar y eliminar usuarios.</p>
+                        <a href="{% url 'admin_users' %}" class="btn btn-primary">
+                            <i class="bi bi-gear"></i> Usuarios
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card admin-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-journal-text text-success" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Gestionar Recetas</h5>
+                        <p class="card-text">Revisar, publicar, ocultar y eliminar recetas.</p>
+                        <a href="{% url 'admin_recipes' %}" class="btn btn-success">
+                            <i class="bi bi-gear"></i> Recetas
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card admin-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-egg text-warning" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Gestionar Ingredientes</h5>
+                        <p class="card-text">Crear, editar y eliminar ingredientes disponibles.</p>
+                        <a href="{% url 'admin_ingredients' %}" class="btn btn-warning">
+                            <i class="bi bi-plus-circle"></i> Ingredientes
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card admin-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-tags text-info" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Gestionar Etiquetas</h5>
+                        <p class="card-text">Crear, editar y eliminar categorías de recetas.</p>
+                        <a href="{% url 'admin_tags' %}" class="btn btn-info">
+                            <i class="bi bi-plus-circle"></i> Etiquetas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actividad reciente -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-clock-history"></i> Usuarios Recientes</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_users %}
+                            <div class="list-group list-group-flush">
+                                {% for user in recent_users %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ user.username }}</strong>
+                                        {% if user.first_name %}
+                                            <br><small class="text-muted">{{ user.first_name }} {{ user.last_name }}</small>
+                                        {% endif %}
+                                        <br><small class="text-muted">{{ user.date_joined|date:"d M Y H:i" }}</small>
+                                    </div>
+                                    <div>
+                                        {% if user.is_active %}
+                                            <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactivo</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'admin_users' %}" class="btn btn-outline-primary">Ver Todos</a>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No hay usuarios registrados aún.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-clock-history"></i> Recetas Recientes</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_recipes %}
+                            <div class="list-group list-group-flush">
+                                {% for recipe in recent_recipes %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ recipe.title|truncatechars:30 }}</strong>
+                                        <br><small class="text-muted">Por: {{ recipe.author.username }}</small>
+                                        <br><small class="text-muted">{{ recipe.created_at|date:"d M Y H:i" }}</small>
+                                    </div>
+                                    <div>
+                                        {% if recipe.is_published %}
+                                            <span class="badge bg-success">Publicada</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Borrador</span>
+                                        {% endif %}
+                                        <br><small class="text-muted">{{ recipe.likes_count }} likes</small>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'admin_recipes' %}" class="btn btn-outline-success">Ver Todas</a>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No hay recetas creadas aún.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

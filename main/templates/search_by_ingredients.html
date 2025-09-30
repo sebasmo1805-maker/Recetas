@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar por Ingredientes - MisRecetas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'recipe_list' %}">
+                <i class="bi bi-book"></i> MisRecetas
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'recipe_list' %}">
+                    <i class="bi bi-search"></i> Explorar
+                </a>
+                {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'user_panel' %}">
+                        <i class="bi bi-house"></i> Panel
+                    </a>
+                    <a class="nav-link" href="{% url 'recipe_create' %}">
+                        <i class="bi bi-plus-circle"></i> Nueva Receta
+                    </a>
+                    <a class="nav-link" href="{% url 'logout' %}">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                    </a>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">
+                        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-4">
+                    <i class="bi bi-basket"></i> 
+                    Buscar Recetas por Ingredientes
+                </h2>
+                <p class="text-muted mb-4">
+                    Selecciona los ingredientes que tienes disponibles y encuentra recetas que los incluyan.
+                </p>
+            </div>
+        </div>
+
+        <!-- Formulario de búsqueda -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-funnel"></i> Selecciona tus ingredientes</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get">
+                            <div class="row">
+                                <!-- Campo de búsqueda rápida -->
+                                <div class="col-md-12 mb-3">
+                                    <input type="text" id="ingredient-search" class="form-control" 
+                                           placeholder="Buscar ingrediente...">
+                                </div>
+                                
+                                <!-- Lista de ingredientes -->
+                                <div class="col-md-12">
+                                    {{ form.ingredients.label_tag }}
+                                    <div id="ingredients-container" class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                        <div class="row">
+                                            {% for choice in form.ingredients %}
+                                            <div class="col-md-3 mb-2 ingredient-item">
+                                                <div class="form-check">
+                                                    {{ choice.tag }}
+                                                    {{ choice.choice_label }}
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-12 mt-3">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-search"></i> Buscar Recetas
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary ms-2" onclick="clearSelection()">
+                                        <i class="bi bi-x-circle"></i> Limpiar Selección
+                                    </button>
+                                    <a href="{% url 'recipe_list' %}" class="btn btn-outline-info ms-2">
+                                        <i class="bi bi-arrow-left"></i> Volver a Explorar
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultados de búsqueda -->
+        {% if recipes is not None %}
+            {% if recipes %}
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle"></i>
+                            Se encontraron <strong>{{ recipes.count }}</strong> recetas con los ingredientes seleccionados.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    {% for recipe in recipes %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            {% if recipe.images.all %}
+                                <img src="{{ recipe.images.first.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="{{ recipe.title }}">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                    <i class="bi bi-image fs-1 text-muted"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ recipe.title }}</h5>
+                                <p class="card-text">{{ recipe.description|truncatewords:15 }}</p>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        Por: <strong>{{ recipe.author.username }}</strong><br>
+                                        <i class="bi bi-clock"></i> {{ recipe.total_time }} min
+                                        <i class="bi bi-people ms-2"></i> {{ recipe.servings }} porciones<br>
+                                        <i class="bi bi-heart-fill text-danger"></i> {{ recipe.likes_count }} me gusta
+                                    </small>
+                                </div>
+
+                                <!-- Mostrar ingredientes coincidentes -->
+                                <div class="mb-2">
+                                    <small class="text-success">
+                                        <strong><i class="bi bi-check2-all"></i> {{ recipe.matching_ingredients }} ingrediente(s) coincidente(s)</strong>
+                                    </small>
+                                </div>
+
+                                <!-- Etiquetas -->
+                                {% if recipe.tags.all %}
+                                <div class="mb-2">
+                                    {% for tag in recipe.tags.all %}
+                                    <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="mt-auto">
+                                    <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary w-100">
+                                        <i class="bi bi-eye"></i> Ver Receta
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-warning text-center">
+                            <i class="bi bi-exclamation-triangle fs-1"></i>
+                            <h4>No se encontraron recetas</h4>
+                            <p>No hay recetas que incluyan los ingredientes seleccionados.</p>
+                            <p>Intenta con una combinación diferente de ingredientes.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Instrucciones iniciales -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-lightbulb fs-1"></i>
+                        <h4>¿Cómo funciona?</h4>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <i class="bi bi-1-circle fs-3 text-primary"></i>
+                                <p><strong>Selecciona ingredientes</strong><br>
+                                Marca los ingredientes que tienes disponibles en casa.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <i class="bi bi-2-circle fs-3 text-primary"></i>
+                                <p><strong>Busca recetas</strong><br>
+                                Haz clic en "Buscar Recetas" para ver todas las opciones.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <i class="bi bi-3-circle fs-3 text-primary"></i>
+                                <p><strong>¡Cocina!</strong><br>
+                                Encuentra la receta perfecta y disfruta cocinando.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Búsqueda en vivo de ingredientes
+        document.getElementById('ingredient-search').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const ingredientItems = document.querySelectorAll('.ingredient-item');
+            
+            ingredientItems.forEach(function(item) {
+                const label = item.querySelector('label').textContent.toLowerCase();
+                if (label.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Limpiar selección
+        function clearSelection() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = false;
+            });
+            document.getElementById('ingredient-search').value = '';
+            
+            // Mostrar todos los ingredientes
+            const ingredientItems = document.querySelectorAll('.ingredient-item');
+            ingredientItems.forEach(function(item) {
+                item.style.display = 'block';
+            });
+        }
+
+        // Contador de ingredientes seleccionados
+        function updateCounter() {
+            const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            const count = checkedBoxes.length;
+            
+            // Actualizar texto del botón si hay selecciones
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (count > 0) {
+                submitBtn.innerHTML = `<i class="bi bi-search"></i> Buscar Recetas (${count} ingredientes)`;
+            } else {
+                submitBtn.innerHTML = `<i class="bi bi-search"></i> Buscar Recetas`;
+            }
+        }
+
+        // Escuchar cambios en los checkboxes
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox') {
+                updateCounter();
+            }
+        });
+
+        // Inicializar contador
+        updateCounter();
+    </script>
+</body>
+</html>

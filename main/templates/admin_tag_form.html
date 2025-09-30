@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ action }} Etiqueta - Panel Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'admin_panel' %}">
+                <i class="bi bi-shield-check"></i> Panel de Administración
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'admin_tags' %}">
+                    <i class="bi bi-arrow-left"></i> Volver a Etiquetas
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0">
+                            <i class="bi bi-tags"></i> 
+                            {{ action }} Etiqueta
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-tag text-info"></i> {{ form.name.label }}
+                                </label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.name.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.color.id_for_label }}" class="form-label">
+                                    <i class="bi bi-palette text-info"></i> {{ form.color.label }}
+                                </label>
+                                <div class="d-flex align-items-center">
+                                    {{ form.color }}
+                                    <span class="ms-3">Vista previa: 
+                                        <span id="color-preview" class="badge" style="background-color: {{ form.color.value|default:'#007bff' }};">
+                                            Etiqueta Ejemplo
+                                        </span>
+                                    </span>
+                                </div>
+                                {% if form.color.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.color.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'admin_tags' %}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-info">
+                                    {% if action == 'Crear' %}
+                                        <i class="bi bi-plus-circle"></i> Crear Etiqueta
+                                    {% else %}
+                                        <i class="bi bi-check-circle"></i> Guardar Cambios
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Actualizar vista previa del color
+        document.getElementById('id_color').addEventListener('input', function() {
+            const preview = document.getElementById('color-preview');
+            preview.style.backgroundColor = this.value;
+        });
+    </script>
+</body>
+</html>

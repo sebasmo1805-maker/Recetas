@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recomendaciones Inteligentes IA - MisRecetas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .ai-badge {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .score-indicator {
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, #dc3545, #ffc107, #28a745);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'recipe_list' %}">
+                <i class="bi bi-book"></i> MisRecetas
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'recommendations' %}">
+                    <i class="bi bi-lightbulb"></i> Recomendaciones Básicas
+                </a>
+                <a class="nav-link" href="{% url 'user_panel' %}">
+                    <i class="bi bi-house"></i> Panel
+                </a>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2>
+                            <i class="bi bi-robot text-primary"></i> 
+                            Recomendaciones Inteligentes
+                            <span class="badge ai-badge ms-2">
+                                <i class="bi bi-cpu"></i> IA v{{ algorithm_info.version }}
+                            </span>
+                        </h2>
+                        <p class="text-muted">
+                            Algoritmo avanzado que aprende de tus gustos y mejora con el tiempo
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del algoritmo -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="bi bi-cpu"></i> Cómo funciona la IA de recomendaciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2 text-center">
+                                <i class="bi bi-person-check text-success fs-2"></i>
+                                <h6 class="mt-2">Análisis de Perfil</h6>
+                                <small class="text-muted">Estudiamos tus gustos y patrones</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <i class="bi bi-people text-info fs-2"></i>
+                                <h6 class="mt-2">Usuarios Similares</h6>
+                                <small class="text-muted">Encontramos personas con gustos parecidos</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <i class="bi bi-graph-up text-warning fs-2"></i>
+                                <h6 class="mt-2">Scoring Inteligente</h6>
+                                <small class="text-muted">Calculamos compatibilidad avanzada</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <i class="bi bi-shuffle text-purple fs-2"></i>
+                                <h6 class="mt-2">Diversidad</h6>
+                                <small class="text-muted">Evitamos repeticiones y monotonía</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <i class="bi bi-clock-history text-secondary fs-2"></i>
+                                <h6 class="mt-2">Aprendizaje</h6>
+                                <small class="text-muted">Mejora con cada interacción</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <i class="bi bi-star text-warning fs-2"></i>
+                                <h6 class="mt-2">Resultados</h6>
+                                <small class="text-muted">Recomendaciones ultra-precisas</small>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <strong>Versión del Algoritmo:</strong><br>
+                                <span class="badge ai-badge">{{ algorithm_info.version }}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Recetas Analizadas:</strong><br>
+                                <span class="text-primary">{{ algorithm_info.total_analyzed }}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Última Actualización:</strong><br>
+                                <span class="text-muted">{{ algorithm_info.last_updated|date:"d M Y H:i" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        {% if recommended_recipes %}
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="mb-3">
+                        <i class="bi bi-cpu text-primary"></i> 
+                        Recetas Seleccionadas por IA
+                        <small class="text-muted">(Ordenadas por compatibilidad inteligente)</small>
+                    </h4>
+                </div>
+                
+                {% for recipe in recommended_recipes %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-primary">
+                        <!-- Badge de IA Score -->
+                        <div class="position-relative">
+                            {% if recipe.images.all %}
+                                <img src="{{ recipe.images.first.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="{{ recipe.title }}">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                    <i class="bi bi-image fs-1 text-muted"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Score visual -->
+                            <div class="position-absolute top-0 start-0 m-2">
+                                <span class="badge ai-badge">
+                                    <i class="bi bi-cpu"></i> Score: {{ recipe.ai_score|floatformat:1 }}
+                                </span>
+                            </div>
+                            
+                            <!-- Barra de compatibilidad -->
+                            <div class="position-absolute bottom-0 start-0 w-100 p-2">
+                                <div class="score-indicator"></div>
+                                <small class="text-white">
+                                    <strong>Compatibilidad: 
+                                    {% if recipe.ai_score >= 2.0 %}Excelente
+                                    {% elif recipe.ai_score >= 1.5 %}Muy Buena
+                                    {% elif recipe.ai_score >= 1.0 %}Buena
+                                    {% else %}Moderada
+                                    {% endif %}
+                                    </strong>
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ recipe.title }}</h5>
+                            <p class="card-text">{{ recipe.description|truncatewords:15 }}</p>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    Por: <strong>{{ recipe.author.username }}</strong><br>
+                                    <i class="bi bi-clock"></i> {{ recipe.total_time }} min
+                                    <i class="bi bi-people ms-2"></i> {{ recipe.servings }} porciones<br>
+                                    <i class="bi bi-heart-fill text-danger"></i> {{ recipe.likes_count }} me gusta
+                                </small>
+                            </div>
+
+                            <!-- Etiquetas -->
+                            {% if recipe.tags.all %}
+                            <div class="mb-2">
+                                {% for tag in recipe.tags.all %}
+                                <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <!-- Por qué se recomienda -->
+                            <div class="mb-2">
+                                <small class="text-primary">
+                                    <i class="bi bi-lightbulb-fill"></i>
+                                    <strong>Recomendada por IA:</strong><br>
+                                    {% if recipe.ai_score >= 2.0 %}
+                                        Coincidencia perfecta con tus gustos
+                                    {% elif recipe.ai_score >= 1.5 %}
+                                        Muy similar a recetas que te gustaron
+                                    {% elif recipe.ai_score >= 1.0 %}
+                                        Usuarios similares la recomiendan
+                                    {% else %}
+                                        Trending y bien valorada
+                                    {% endif %}
+                                </small>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary w-100">
+                                    <i class="bi bi-eye"></i> Ver Receta
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-robot fs-1"></i>
+                        <h4>IA Entrenándose</h4>
+                        <p>La inteligencia artificial necesita más datos para generar recomendaciones personalizadas.</p>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <i class="bi bi-heart text-danger fs-3"></i>
+                                <p><strong>Da "me gusta"</strong><br>
+                                <a href="{% url 'recipe_list' %}">Explora recetas</a> y marca tus favoritas.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <i class="bi bi-search text-primary fs-3"></i>
+                                <p><strong>Busca recetas</strong><br>
+                                Usa el <a href="{% url 'search_by_ingredients' %}">buscador</a> frecuentemente.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <i class="bi bi-plus-circle text-success fs-3"></i>
+                                <p><strong>Crea contenido</strong><br>
+                                <a href="{% url 'recipe_create' %}">Publica recetas</a> propias.</p>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <p>Mientras tanto, puedes usar las <a href="{% url 'recommendations' %}">recomendaciones básicas</a>.</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Información adicional -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-info-circle"></i> Sobre las Recomendaciones Inteligentes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-shield-check text-success"></i> Privacidad</h6>
+                                <p class="small">Todos los análisis se realizan de forma anónima y segura. No compartimos tus datos personales.</p>
+                                
+                                <h6><i class="bi bi-graph-up text-primary"></i> Mejora Continua</h6>
+                                <p class="small">Cuanto más uses la plataforma, mejores serán las recomendaciones. La IA aprende de tus preferencias.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-people text-info"></i> Collaborative Filtering</h6>
+                                <p class="small">Analizamos usuarios con gustos similares para sugerir recetas que podrían gustarte.</p>
+                                
+                                <h6><i class="bi bi-cpu text-warning"></i> Machine Learning</h6>
+                                <p class="small">Algoritmos avanzados procesan múltiples factores para generar el score de compatibilidad.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="row mt-4">
+            <div class="col-md-12 text-center">
+                <h5>¿No te convencen las recomendaciones?</h5>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'recommendations' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-lightbulb"></i> Recomendaciones Básicas
+                    </a>
+                    <a href="{% url 'recipe_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-search"></i> Explorar Todas
+                    </a>
+                    <a href="{% url 'update_preferences' %}" class="btn btn-outline-success">
+                        <i class="bi bi-gear"></i> Ajustar Preferencias
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
