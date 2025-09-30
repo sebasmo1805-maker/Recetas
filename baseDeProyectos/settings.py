@@ -62,9 +62,11 @@ WSGI_APPLICATION = 'baseDeProyectos.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR}/db.sqlite3",  # Usa SQLite si no hay DATABASE_URL
+        default=f"sqlite:///{BASE_DIR}/db.sqlite3",  # SQLite en local
         conn_max_age=600,
         ssl_require=False
     )
@@ -101,7 +103,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
